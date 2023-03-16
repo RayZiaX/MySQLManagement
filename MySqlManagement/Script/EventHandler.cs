@@ -83,7 +83,7 @@ namespace MySqlManagement.Script
             }
         }
 
-        private void Select(string pRequest)
+        public void Select(string pRequest)
         {
             string[] req = pRequest.Split(" ");
             switch (req.Length)
@@ -115,7 +115,7 @@ namespace MySqlManagement.Script
                         Console.WriteLine(strHeaders);
                         Console.WriteLine("");
 
-                        foreach (Dictionary<string,string> r in Table.ReadTable(Path.Combine(this._pathDatabase, fileName)))
+                        foreach (Dictionary<string,string> r in Table.Select(Path.Combine(this._pathDatabase, fileName)))
                         {
                             string row = string.Empty;
                             foreach (string value in r.Values)
