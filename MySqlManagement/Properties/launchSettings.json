@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MySqlManagement": {
+      "commandName": "Project",
+      "commandLineArgs": "mybdd -v"
+    }
+  }
+}

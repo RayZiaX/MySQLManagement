@@ -43,5 +43,19 @@ namespace MySqlManagement.Script
             _disposed = true;
         }
 
+        public bool Login(string user, string password)
+        {
+            List<Dictionary<string,string>> datas = Table.Select(Path.Combine(this.DatabasePath, "Admin", "Users.csv"));
+            foreach (Dictionary<string, string> data in datas)
+            {
+                if (data["user"].Equals(user) && data["password"].Equals(password))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }

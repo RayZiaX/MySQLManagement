@@ -33,16 +33,13 @@ namespace MySqlManagement.Script
             File.WriteAllLines(_path, columns);
         }
 
-
-
-
         public string CreateHeaderCSV()
         {
             DataColumn[] col = _table.Columns.Cast<DataColumn>().ToArray();
             return string.Join(Engine.Separator, col.Select(c => c.ColumnName));
         }
 
-        public static List<Dictionary<string, string>> ReadTable(string path)
+        public static List<Dictionary<string, string>> Select(string path)
         {
             List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
             using (var reader = new StreamReader(path))
