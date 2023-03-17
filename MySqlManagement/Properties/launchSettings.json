@@ -2,7 +2,7 @@
   "profiles": {
     "MySqlManagement": {
       "commandName": "Project",
-      "commandLineArgs": "mybdd -u root -p root -f=json"
+      "commandLineArgs": "mybdd --user root --password root"
     }
   }
 }

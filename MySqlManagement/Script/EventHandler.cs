@@ -65,7 +65,7 @@ namespace MySqlManagement.Script
                 case CommandEnum.INSERT:
                     if (this.DbConnect())
                     {
-                        Insert(pRequest);
+                        Insert(command);
                     }
                     break;
                 case CommandEnum.DESCRIBE:
@@ -75,7 +75,7 @@ namespace MySqlManagement.Script
                     }
                     break;
                 default:
-                    Console.WriteLine(command); 
+                    Console.WriteLine($"Commande {command} non reconnue"); 
                     break;
             }
         }
@@ -151,6 +151,24 @@ namespace MySqlManagement.Script
                     break;
             }
         }
+        private void Create(string pCommand) 
+        {
+            Utils.ResponseCreate res = new Utils.ResponseCreate(pCommand.Split(" ").Where(d => !string.IsNullOrEmpty(d)).ToArray());
+
+            switch (res.Type)
+            {
+                case Utils.TypeEnum.NONE:
+                    Utils.ShowMessage("Aucune information entrée");
+                    break;
+                case Utils.TypeEnum.DATABASE:
+                    CreateDatabase(res.name);
+                    break;
+                case Utils.TypeEnum.TABLE:
+                    CreateTable(res.name,res.Values);
+                    break;
+            }
+
+        }
         #endregion
         
         #region Affichage des tables ou des bases de données
@@ -200,24 +218,6 @@ namespace MySqlManagement.Script
         }
         #endregion
 
-        private void Create(string pCommand) 
-        {
-            Utils.ResponseCreate res = new Utils.ResponseCreate(pCommand.Split(" ").Where(d => !string.IsNullOrEmpty(d)).ToArray());
-
-            switch (res.Type)
-            {
-                case Utils.TypeEnum.NONE:
-                    Utils.ShowMessage("Aucune information entrée");
-                    break;
-                case Utils.TypeEnum.DATABASE:
-                    CreateDatabase(res.name);
-                    break;
-                case Utils.TypeEnum.TABLE:
-                    CreateTable(res.name,res.Values);
-                    break;
-            }
-
-        }
 
         private void CreateDatabase(string baseName)
         {
@@ -260,33 +260,12 @@ namespace MySqlManagement.Script
             //table.Close();
         }
 
-        private void Insert(string pRequest) 
+        private void Insert(string command) 
         {
-            string[] req = pRequest.Split(" ");
-            string name = string.Empty;
-            List<string> values = new List<string>();
-            switch (req.Length)
-            {
-                case 1:
-                    Console.WriteLine("Veuillez entrez 4 arguments");
-                    break;
-                case 2:
-                    Console.WriteLine("Veuillez entrez 3 arguments");
-                    break;
-                case 3:
-                    Console.WriteLine("Veuillez entrez 2 arguments");
-                    break;
-                case 4:
-                    Console.WriteLine("Veuillez entrez 1 argument");
-                    break;
-                case 5:
-                    name = req[2]; // nom de la table
-                    values = TreatValues(req[4].Split(","));
-                    InsertData(name, values);
-                    break;
-                default:
-                    break;
-            }
+            string[] req = command.Split("values");
+            string tableName = req[0].Trim();
+            List<string> values = req[1].Split(",").Select(s=> s.Replace("(","").Replace(")","")).ToList();
+            InsertData(tableName, values);
         }
 
         private void InsertData(string name, List<string> values)
@@ -315,12 +294,18 @@ namespace MySqlManagement.Script
         }
         private string GetCommand(string pCommand)
         {
+            this.command = CommandEnum.NONE;
             string command = string.Empty;
             string cmdTemp = pCommand.ToLower();
+            string firstWord = cmdTemp.Split(" ")[0];
+            if(firstWord.ToLower() == "insert")
+            {
+                firstWord = $"{firstWord} {cmdTemp.Split(" ")[1]}";
+            }
             string[] keywords = Engine.GetInstance().KEYWORD;
             for (int i = 0; i < keywords.Length; i++)
             {
-                if (cmdTemp.Contains(keywords[i].ToLower()))
+                if (firstWord.Contains(keywords[i].ToLower()))
                 {
                     this.command = (CommandEnum)i;
                     command = pCommand.Replace(keywords[i].ToLower(), "");

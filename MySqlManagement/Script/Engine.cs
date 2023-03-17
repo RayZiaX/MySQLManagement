@@ -49,6 +49,11 @@ namespace MySqlManagement.Script
             _disposed = true;
         }
 
+        public EventHandler GetHandler()
+        {
+            return this._handler;
+        }
+
         public bool Login(string user, string password)
         {
             List<Dictionary<string,string>> datas = Table.Select(Path.Combine(this.DatabasePath, "Admin", "Users.csv"));

@@ -1,5 +1,6 @@
 ﻿using MySqlManagement.Script;
 using System;
+using System.ComponentModel.Design;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
@@ -24,7 +25,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
             {
                 TestConnexion(req);
             }
-            if ((!string.IsNullOrEmpty(req.user) && !string.IsNullOrEmpty(req.password)) && !req.login)
+            if ((!string.IsNullOrEmpty(req.user) && !string.IsNullOrEmpty(req.password)) && !req.login && string.IsNullOrEmpty(req.options))
             {
                 Engine.GetInstance().FormatEnum = req.format;
                 Console.WriteLine("Connexion en cours... ");
@@ -39,38 +40,50 @@ namespace MyApp // Note: actual namespace depends on the project name.
                     Thread.Sleep(5000);
                 }
             }
+            if (!string.IsNullOrEmpty(req.options))
+            {
+                string command = req.options.Replace("\"","");
+                string[] commands = command.Split(';');
+                for (int i = 0; i < commands.Length; i++)
+                {
+                    Engine.GetInstance().GetHandler().GetRequest(commands[i]) ;
+                }
+                Thread.Sleep(5000);
+            }
+
         }
 
         private static RequestArgs CheckArgs(string[] args)
         {
+
             RequestArgs request = new RequestArgs();
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i].Equals("-u") || args[i].Equals("--user"))
+                if (args[i] == "-u" || args[i] == "--user")
                 {
                     request.user = args[i + 1];
-                }else if (args[i].Equals("-p") || args[i].Equals("--password"))
+                }
+                if (args[i] == "-p" || args[i] == "--password")
                 {
                     request.password = args[i + 1];
-                }else if (args[i].Equals("-l") || args[i].Equals("--login"))
+                }
+                if (args[i] == "-l" || args[i] == "--login")
                 {
                     request.login = true;
-                }else if(args[i].Equals("-v") || args[i].Equals("--version"))
+                }
+                if(args[i] == "-v" || args[i] == "--version")
                 {
                     request.version = true;
-                }else if(args[i].Equals("-h") || args[i].Equals("--help"))
+                }
+                if(args[i] == "-h" || args[i] == "--help")
                 {
                     request.help = true;
                 }
-                /*else if (args[i].Equals("-s") || args[i].Equals("--sql")) { }
+                
+                if (args[i] == "-s" || args[i] == "--sql")
                 {
-                    request.options = new List<string>();
-                    for (int j = i; j < args.Length; j++)
-                    {
-                        request.options.Add(args[j]);
-                    }
-                    break;
-                }*/
+                    request.options = args[i + 1];
+                }
             }
             request.format = GetFormat(args);
             return request;
@@ -145,7 +158,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
             public bool version { get; set; }
             public bool help { get; set; }
             public Utils.FormatEnum format { get; set; }
-            public List<string>? options{ get; set; }
+            public string? options{ get; set; }
         }
     }
 }
