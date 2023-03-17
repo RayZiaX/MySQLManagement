@@ -2,7 +2,7 @@
   "profiles": {
     "MySqlManagement": {
       "commandName": "Project",
-      "commandLineArgs": "mybdd --user root --password root"
+      "commandLineArgs": "mybdd --user root --password root -s \"use PatataBase;select * from PatataUsers\""
     }
   }
 }

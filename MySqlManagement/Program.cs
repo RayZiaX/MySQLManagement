@@ -42,6 +42,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
             }
             if (!string.IsNullOrEmpty(req.options))
             {
+                Engine.GetInstance().FormatEnum = req.format;
                 string command = req.options.Replace("\"","");
                 string[] commands = command.Split(';');
                 for (int i = 0; i < commands.Length; i++)
@@ -94,13 +95,14 @@ namespace MyApp // Note: actual namespace depends on the project name.
             string strTemp = string.Empty;
             for (int i = 0; i < req.Length; i++)
             {
+
                 if (req[i].ToLower().Contains("-f"))
                 {
                     strTemp = req[i].Replace("-f=", "");
-                }
-                else if (req[i].ToLower().Contains("--format"))
-                {
-                    strTemp = req[i].Replace("--format=", "");
+                    if (req[i].ToLower().Contains("--format"))
+                    {
+                        strTemp = req[i].Replace("--format=", "");
+                    }
                 }
             }
             switch (strTemp.ToLower())
