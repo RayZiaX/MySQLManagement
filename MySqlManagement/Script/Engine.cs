@@ -12,14 +12,20 @@ namespace MySqlManagement.Script
         private EventHandler _handler = null;
         public string DatabasePath = string.Empty;
         public static char Separator = ';';
-        private static Engine _instance { get; set; }
+        public readonly string[] KEYWORD =
+        {
+            "CREATE","INSERT INTO","USE","SHOW","DESCRIBE","SELECT"
+        };
+        public Utils.FormatEnum FormatEnum = Utils.FormatEnum.NONE;
+
+        private static Engine instance { get; set; }
         public static Engine GetInstance() 
         {
-            if(_instance == null)
+            if(instance == null)
             {
-                _instance = new Engine();
+                instance = new Engine();
             }
-            return _instance;
+            return instance;
         }
 
         protected Engine()
@@ -56,6 +62,7 @@ namespace MySqlManagement.Script
 
             return false;
         }
+
 
     }
 }

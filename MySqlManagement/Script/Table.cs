@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -83,6 +84,17 @@ namespace MySqlManagement.Script
             return false;
         }
 
+        public static bool Exist(string path)
+        {
+            if (File.Exists(path))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public void Insert(List<string> pColumn, List<string> pValues)
         {
             Dictionary<string, string> newData = new Dictionary<string, string>();

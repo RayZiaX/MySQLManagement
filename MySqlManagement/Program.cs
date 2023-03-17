@@ -18,27 +18,15 @@ namespace MyApp // Note: actual namespace depends on the project name.
             }
             if(req.help)
             {
-                Console.WriteLine("-------");
-                Console.WriteLine(" ");
-                Console.WriteLine("-h ou --help: Permet d'afficher les différents paramètre de lancement");
-                Console.WriteLine(" ");
-                Console.WriteLine("-v ou --version: Permet d'afficher la dernier version en production de l'application");
-                Console.WriteLine(" ");
-                Console.WriteLine("-l --login: Permet de testé la connexion au serveur sql.");
-                Console.WriteLine(" ");
-                Console.WriteLine("-u --user: Indique à l'application de nom d'utilisateur qui sera utilisé sur le serveur.");
-                Console.WriteLine("");
-                Console.WriteLine("-p --password: Indique à l'application de mot de passe qui sera utilisé sur le serveur pour la connexion.");
-                Console.WriteLine(" ");
-                Console.WriteLine("-s --sql: Permet de réaliser une requête sql et quitter l'application.");
-                Console.WriteLine("");
-                Console.WriteLine("-f --forma: Permet de retourné un type de format pour les donnée des tables (CSV, JSON et Tableau visuel)");
-                Console.WriteLine("");
-                Console.WriteLine("-------");
-
+                PrintPaperGuide();
             }
-            if (req.login && (req.options?.Count == 0 || req.options == null ))
+            if (req.login)
             {
+                TestConnexion(req);
+            }
+            if ((!string.IsNullOrEmpty(req.user) && !string.IsNullOrEmpty(req.password)) && !req.login)
+            {
+                Engine.GetInstance().FormatEnum = req.format;
                 Console.WriteLine("Connexion en cours... ");
                 if (Engine.GetInstance().Login(req.user, req.password))
                 {
@@ -50,10 +38,6 @@ namespace MyApp // Note: actual namespace depends on the project name.
                     Console.WriteLine("Connexion refusée");
                     Thread.Sleep(5000);
                 }
-            }
-            else if(req.options?.Count > 0)
-            {
-
             }
         }
 
@@ -88,9 +72,71 @@ namespace MyApp // Note: actual namespace depends on the project name.
                     break;
                 }*/
             }
+            request.format = GetFormat(args);
             return request;
         }
 
+        private static Utils.FormatEnum GetFormat(string[] req)
+        {
+            string strTemp = string.Empty;
+            for (int i = 0; i < req.Length; i++)
+            {
+                if (req[i].ToLower().Contains("-f"))
+                {
+                    strTemp = req[i].Replace("-f=", "");
+                }
+                else if (req[i].ToLower().Contains("--format"))
+                {
+                    strTemp = req[i].Replace("--format=", "");
+                }
+            }
+            switch (strTemp.ToLower())
+            {
+                case "csv":
+                    return Utils.FormatEnum.CSV;
+                case "json":
+                    return Utils.FormatEnum.JSON;
+                case "array":
+                default:
+                    return Utils.FormatEnum.ARRAY;
+            }
+        }
+
+        private static void PrintPaperGuide()
+        {
+            Console.WriteLine("-------");
+            Console.WriteLine(" ");
+            Console.WriteLine("-h ou --help: Permet d'afficher les différents paramètre de lancement");
+            Console.WriteLine(" ");
+            Console.WriteLine("-v ou --version: Permet d'afficher la dernier version en production de l'application");
+            Console.WriteLine(" ");
+            Console.WriteLine("-l --login: Permet de testé la connexion au serveur sql.");
+            Console.WriteLine(" ");
+            Console.WriteLine("-u --user: Indique à l'application de nom d'utilisateur qui sera utilisé sur le serveur.");
+            Console.WriteLine("");
+            Console.WriteLine("-p --password: Indique à l'application de mot de passe qui sera utilisé sur le serveur pour la connexion.");
+            Console.WriteLine(" ");
+            Console.WriteLine("-s --sql: Permet de réaliser une requête sql et quitter l'application.");
+            Console.WriteLine("");
+            Console.WriteLine("-f --forma: Permet de retourné un type de format pour les donnée des tables (CSV, JSON et Tableau visuel)");
+            Console.WriteLine("");
+            Console.WriteLine("-------");
+
+            Thread.Sleep(5000);
+        }
+
+        private static void TestConnexion(RequestArgs pReq)
+        {
+            if (Engine.GetInstance().Login(pReq.user, pReq.password))
+            {
+                Console.WriteLine("Connexion réussi");
+            }
+            else
+            {
+                Console.WriteLine("Connexion refusée");
+            }
+            Thread.Sleep(5000);
+        }
         struct RequestArgs
         {
             public string user { get; set; }
@@ -98,7 +144,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
             public bool login { get; set; }
             public bool version { get; set; }
             public bool help { get; set; }
-            public string format { get; set; }
+            public Utils.FormatEnum format { get; set; }
             public List<string>? options{ get; set; }
         }
     }
